@@ -18,6 +18,7 @@ abstract class Limitation extends ValueObject
     // consts for BC
     const CONTENTTYPE = 'Class';
     const LANGUAGE = 'Language';
+    const NEWLANGUAGE = 'NewLanguage';
     const LOCATION = 'Node';
     const OWNER = 'Owner';
     const PARENTOWNER = 'ParentOwner';

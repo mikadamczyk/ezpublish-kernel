@@ -2,6 +2,7 @@ parameters:
     ezpublish.api.role.limitation_type.blocking.class: eZ\Publish\Core\Limitation\BlockingLimitationType
     ezpublish.api.role.limitation_type.content_type.class: eZ\Publish\Core\Limitation\ContentTypeLimitationType
     ezpublish.api.role.limitation_type.language.class: eZ\Publish\Core\Limitation\LanguageLimitationType
+    ezpublish.api.role.limitation_type.new_language.class: eZ\Publish\Core\Limitation\NewLanguageLimitationType
     ezpublish.api.role.limitation_type.location.class: eZ\Publish\Core\Limitation\LocationLimitationType
     ezpublish.api.role.limitation_type.owner.class: eZ\Publish\Core\Limitation\OwnerLimitationType
     ezpublish.api.role.limitation_type.parent_content_type.class: eZ\Publish\Core\Limitation\ParentContentTypeLimitationType
@@ -32,6 +33,12 @@ services:
         arguments: ["@ezpublish.api.persistence_handler"]
         tags:
             - {name: ezpublish.limitationType, alias: Language}
+
+    ezpublish.api.role.limitation_type.new_language:
+        class: "%ezpublish.api.role.limitation_type.new_language.class%"
+        arguments: ["@ezpublish.api.persistence_handler"]
+        tags:
+            - {name: ezpublish.limitationType, alias: NewLanguage}
 
     ezpublish.api.role.limitation_type.location:
         class: "%ezpublish.api.role.limitation_type.location.class%"

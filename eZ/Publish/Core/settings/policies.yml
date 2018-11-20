@@ -5,7 +5,7 @@ parameters:
             diff: { Class: true, Section: true, Owner: true, Node: true, Subtree: true }
             view_embed: { Class: true, Section: true, Owner: true, Node: true, Subtree: true }
             create: { Class: true, Section: true, ParentOwner: true, ParentGroup: true, ParentClass: true, ParentDepth: true, Node: true, Subtree: true, Language: true }
-            edit: { Class: true, Section: true, Owner: true, Group: true, Node: true, Subtree: true, Language: true, State: true }
+            edit: { Class: true, Section: true, Owner: true, Group: true, Node: true, Subtree: true, Language: true, State: true, NewLanguage: true }
             publish: { Class: true, Section: true, Owner: true, Group: true, Node: true, Subtree: true, Language: true, State: true }
             manage_locations: { Class: true , Section: true , Owner: true, Subtree: true, State: true }
             hide: { Class: true, Section: true, Owner: true, Group: true, Node: true, Subtree: true, Language: true }

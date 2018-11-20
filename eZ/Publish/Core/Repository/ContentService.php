@@ -41,6 +41,7 @@ use eZ\Publish\SPI\Persistence\Content\UpdateStruct as SPIContentUpdateStruct;
 use eZ\Publish\SPI\Persistence\Content\Field as SPIField;
 use eZ\Publish\SPI\Persistence\Content\Relation\CreateStruct as SPIRelationCreateStruct;
 use Exception;
+use EzSystems\RepositoryForms\Data\Content\ContentUpdateData;
 
 /**
  * This class provides service methods for managing content.
@@ -1108,6 +1109,10 @@ class ContentService implements ContentServiceInterface
             $creator = $this->repository->getCurrentUserReference();
         }
 
+        $contentUpdateStruct = new ContentUpdateData([
+            'initialLanguageCode' => $versionInfo->initialLanguageCode ?? $contentInfo->mainLanguageCode,
+        ]);
+
         if (!$this->repository->canUser('content', 'edit', $contentInfo)) {
             throw new UnauthorizedException('content', 'edit', array('contentId' => $contentInfo->id));
         }
@@ -1199,7 +1204,7 @@ class ContentService implements ContentServiceInterface
             );
         }
 
-        if (!$this->repository->canUser('content', 'edit', $content)) {
+        if (!$this->repository->canUser('content', 'edit', $content, $contentUpdateStruct)) {
             throw new UnauthorizedException('content', 'edit', array('contentId' => $content->id));
         }
 
