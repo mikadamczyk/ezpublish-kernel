@@ -26,11 +26,11 @@ class FieldValueConverterRegistryPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('ezpublish.persistence.legacy.field_value_converter.registry')) {
+        if (!$container->hasDefinition('ezpublish.persistence.legacy.field_value_converter.registry.inner')) {
             return;
         }
 
-        $registry = $container->getDefinition('ezpublish.persistence.legacy.field_value_converter.registry');
+        $registry = $container->getDefinition('ezpublish.persistence.legacy.field_value_converter.registry.inner');
 
         $deprecatedFieldTypeStorageConverterTags = $container->findTaggedServiceIds(self::DEPRECATED_STORAGE_ENGINE_LEGACY_CONVERTER_SERVICE_TAG);
         foreach ($deprecatedFieldTypeStorageConverterTags as $deprecatedFieldTypeStorageConverterTag) {
