@@ -54,11 +54,6 @@ services:
         arguments:
             - '@ezpublish.fieldType.generic.serializer'
 
-#    ezpublish.fieldType.generic.converter:
-#        class: "%ezpublish.fieldType.generic.converter.class%"
-#        arguments:
-#            - '@ezpublish.fieldType.generic.serializer'
-
     ezpublish.fieldType.generic.converter.provider:
         class: '%ezpublish.fieldType.generic.converter.provider.class%'
         arguments:
