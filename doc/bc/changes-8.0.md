@@ -22,3 +22,7 @@ Changes affecting version compatibility with former or future versions.
 * REST Server implementation and Common namespace have been removed in favor of
   eZ Platform REST Bundle available via
   [ezsystems/ezplatform-rest](https://github.com/ezsystems/ezplatform-rest) package.
+    * ezprice 
+    
+* Deprecated method `getName` from the interface `eZ\Publish\SPI\FieldType\FieldType` has been removed. 
+  All implementations of this method are also removed. If you used it, please use `eZ\Publish\SPI\FieldType\Nameable` interface instead.
