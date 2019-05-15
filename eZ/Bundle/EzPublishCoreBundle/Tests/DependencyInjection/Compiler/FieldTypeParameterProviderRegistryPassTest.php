@@ -33,12 +33,15 @@ class FieldTypeParameterProviderRegistryPassTest extends AbstractCompilerPassTes
         $container->addCompilerPass(new FieldTypeParameterProviderRegistryPass());
     }
 
-    public function testRegisterFieldType()
+    /**
+     * @dataProvider tagsProvider
+     */
+    public function testRegisterFieldType(string $tag)
     {
         $fieldTypeIdentifier = 'field_type_identifier';
         $serviceId = 'service_id';
         $def = new Definition();
-        $def->addTag('ezpublish.fieldType.parameterProvider', array('alias' => $fieldTypeIdentifier));
+        $def->addTag($tag, array('alias' => $fieldTypeIdentifier));
         $this->setDefinition($serviceId, $def);
 
         $this->compile();
@@ -51,14 +54,16 @@ class FieldTypeParameterProviderRegistryPassTest extends AbstractCompilerPassTes
     }
 
     /**
+     * @dataProvider tagsProvider
+     *
      * @expectedException \LogicException
      */
-    public function testRegisterFieldTypeNoAlias()
+    public function testRegisterFieldTypeNoAlias(string $tag)
     {
         $fieldTypeIdentifier = 'field_type_identifier';
         $serviceId = 'service_id';
         $def = new Definition();
-        $def->addTag('ezpublish.fieldType.parameterProvider');
+        $def->addTag($tag);
         $this->setDefinition($serviceId, $def);
 
         $this->compile();
@@ -68,5 +73,13 @@ class FieldTypeParameterProviderRegistryPassTest extends AbstractCompilerPassTes
             'setParameterProvider',
             array(new Reference($serviceId), $fieldTypeIdentifier)
         );
+    }
+
+    public function tagsProvider(): array
+    {
+        return [
+            ['ezpublish.fieldType.parameterProvider'],
+            ['ezplatform.field_type.parameter_provider'],
+        ];
     }
 }
