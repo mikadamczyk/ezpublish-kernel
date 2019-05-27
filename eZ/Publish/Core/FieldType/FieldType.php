@@ -271,7 +271,7 @@ abstract class FieldType implements FieldTypeInterface
      */
     protected function getSortInfo(Value $value)
     {
-        return null;
+        throw new \RuntimeException('Not implemented, yet.');
     }
 
     /**
