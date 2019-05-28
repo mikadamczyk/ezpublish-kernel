@@ -8,12 +8,13 @@
  */
 namespace eZ\Publish\Core\FieldType\Time;
 
+use DateTime;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
 use eZ\Publish\Core\FieldType\ValidationError;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
-use DateTime;
 
 class Type extends FieldType
 {
@@ -47,6 +48,22 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return 'eztime';
+    }
+
+    /**
+     * @param \eZ\Publish\Core\FieldType\Time\Value|\eZ\Publish\SPI\FieldType\Value $value
+     *
+     * @throws \Exception
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        if ($this->isEmptyValue($value)) {
+            return '';
+        }
+
+        $dateTime = new DateTime("@{$value->time}");
+
+        return $dateTime->format('g:i:s a');
     }
 
     /**

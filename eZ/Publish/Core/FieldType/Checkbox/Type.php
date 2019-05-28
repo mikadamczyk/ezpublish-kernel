@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\Checkbox;
 
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
@@ -28,6 +29,11 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return 'ezboolean';
+    }
+
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return $value->bool ? '1' : '0';
     }
 
     /**

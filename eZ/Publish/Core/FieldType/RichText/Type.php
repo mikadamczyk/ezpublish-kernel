@@ -100,6 +100,29 @@ class Type extends FieldType
     }
 
     /**
+     * @param \eZ\Publish\Core\FieldType\RichText\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        $result = null;
+        if ($section = $value->xml->documentElement->firstChild) {
+            $textDom = $section->firstChild;
+
+            if ($textDom && $textDom->hasChildNodes()) {
+                $result = $textDom->firstChild->textContent;
+            } elseif ($textDom) {
+                $result = $textDom->textContent;
+            }
+        }
+
+        if ($result === null) {
+            $result = $value->xml->documentElement->textContent;
+        }
+
+        return trim(preg_replace(array('/\n/', '/\s\s+/'), ' ', $result));
+    }
+
+    /**
      * Returns the fallback default value of field type when no such default
      * value is provided in the field definition in content types.
      *

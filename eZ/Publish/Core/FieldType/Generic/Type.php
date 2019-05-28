@@ -10,16 +10,16 @@ namespace eZ\Publish\Core\FieldType\Generic;
 
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
+use eZ\Publish\Core\FieldType\Generic\Value as GenericValue;
 use eZ\Publish\Core\FieldType\ValidationError;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
-use eZ\Publish\SPI\FieldType\Nameable;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-abstract class Type extends FieldType implements Nameable
+abstract class Type extends FieldType
 {
     /** @var \Symfony\Component\Serializer\SerializerInterface */
     protected $serializer;
@@ -33,9 +33,13 @@ abstract class Type extends FieldType implements Nameable
         $this->validator = $validator;
     }
 
-    public function getFieldName(SPIValue $value, FieldDefinition $fieldDefinition, $languageCode): string
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
     {
-        return (string)$value;
+        if ($value instanceof GenericValue) {
+            return (string)$value;
+        }
+
+        return '';
     }
 
     public function getEmptyValue()

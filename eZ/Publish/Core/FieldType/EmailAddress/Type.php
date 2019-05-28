@@ -13,6 +13,7 @@ use eZ\Publish\Core\FieldType\ValidationError;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
 use eZ\Publish\Core\FieldType\Validator\EmailAddressValidator;
+use eZ\Publish\Core\Persistence\TransformationProcessor;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
 
@@ -26,6 +27,11 @@ class Type extends FieldType
     protected $validatorConfigurationSchema = array(
         'EmailAddressValidator' => array(),
     );
+
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return $this->transformationProcessor->transformByGroup((string)$value, 'lowercase');
+    }
 
     /**
      * Validates the validatorConfiguration of a FieldDefinitionCreateStruct or FieldDefinitionUpdateStruct.

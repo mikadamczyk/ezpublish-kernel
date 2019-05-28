@@ -125,6 +125,28 @@ class Type extends FieldType
         return 'ezselection';
     }
 
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        if (empty($value->selection)) {
+            return '';
+        }
+
+        $names = [];
+        $fieldSettings = $fieldDefinition->getFieldSettings();
+
+        foreach ($value->selection as $optionIndex) {
+            if (isset($fieldSettings['multilingualOptions'][$languageCode][$optionIndex])) {
+                $names[] = $fieldSettings['multilingualOptions'][$languageCode][$optionIndex];
+            } elseif (isset($fieldSettings['multilingualOptions'][$fieldDefinition->mainLanguageCode][$optionIndex])) {
+                $names[] = $fieldSettings['multilingualOptions'][$fieldDefinition->mainLanguageCode][$optionIndex];
+            } elseif (isset($fieldSettings['options'][$optionIndex])) {
+                $names[] = $fieldSettings['options'][$optionIndex];
+            }
+        }
+
+        return implode(' ', $names);
+    }
+
     /**
      * Returns the fallback default value of field type when no such default
      * value is provided in the field definition in content types.

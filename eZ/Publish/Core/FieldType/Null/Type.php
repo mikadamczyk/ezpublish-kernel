@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\Null;
 
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
@@ -44,6 +45,14 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return $this->fieldTypeIdentifier;
+    }
+
+    /**
+     * @param \eZ\Publish\Core\FieldType\Null\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return (string)$value->value;
     }
 
     /**

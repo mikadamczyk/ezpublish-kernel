@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\Author;
 
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
@@ -49,6 +50,11 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return 'ezauthor';
+    }
+
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return $value->authors[0]->name ?? '';
     }
 
     /**

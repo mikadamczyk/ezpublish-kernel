@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\RelationList;
 
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\Core\FieldType\ValidationError;
@@ -15,6 +16,7 @@ use eZ\Publish\API\Repository\Values\Content\ContentInfo;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
 use eZ\Publish\API\Repository\Values\Content\Relation;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
+use eZ\Publish\SPI\Persistence\Content\Handler as SPIContentHandler;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
 
 /**
@@ -62,6 +64,13 @@ class Type extends FieldType
             ),
         ),
     );
+
+    private $handler;
+
+    public function __construct(SPIContentHandler $handler)
+    {
+        $this->handler = $handler;
+    }
 
     /**
      * @see \eZ\Publish\Core\FieldType\FieldType::validateFieldSettings()
@@ -270,6 +279,34 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return 'ezobjectrelationlist';
+    }
+
+    /**
+     * @param \eZ\Publish\Core\FieldType\RelationList\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        if (empty($value->destinationContentIds)) {
+            return '';
+        }
+
+        $names = [];
+        foreach ($value->destinationContentIds as $contentId) {
+            try {
+                $contentInfo = $this->handler->loadContentInfo($contentId);
+                $versionInfo = $this->handler->loadVersionInfo($contentId, $contentInfo->currentVersionNo);
+            } catch (NotFoundException $e) {
+                continue;
+            }
+
+            if (isset($versionInfo->names[$languageCode])) {
+                $names[] = $versionInfo->names[$languageCode];
+            } else {
+                $names[] = $versionInfo->names[$contentInfo->mainLanguageCode];
+            }
+        }
+
+        return implode(' ', $names);
     }
 
     /**

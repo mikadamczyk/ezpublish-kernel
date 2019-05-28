@@ -8,6 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\Url;
 
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\SPI\Persistence\Content\FieldValue;
 use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
@@ -29,6 +30,14 @@ class Type extends FieldType
     public function getFieldTypeIdentifier()
     {
         return 'ezurl';
+    }
+
+    /**
+     * @param \eZ\Publish\Core\FieldType\Url\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return (string)$value->text;
     }
 
     /**

@@ -42,6 +42,11 @@ abstract class Type extends FieldType
      */
     abstract protected function createValue(array $inputValue);
 
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return (string)$value->fileName;
+    }
+
     /**
      * Inspects given $inputValue and potentially converts it into a dedicated value object.
      *

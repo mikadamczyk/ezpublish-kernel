@@ -72,6 +72,14 @@ class Type extends FieldType
     }
 
     /**
+     * @param \eZ\Publish\Core\FieldType\User\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return (string)$value->login;
+    }
+
+    /**
      * Indicates if the field definition of this type can appear only once in the same ContentType.
      *
      * @return bool

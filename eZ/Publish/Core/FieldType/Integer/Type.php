@@ -157,6 +157,14 @@ class Type extends FieldType
     }
 
     /**
+     * @param \eZ\Publish\Core\FieldType\Integer\Value|\eZ\Publish\SPI\FieldType\Value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        return (string)$value;
+    }
+
+    /**
      * Returns the fallback default value of field type when no such default
      * value is provided in the field definition in content types.
      *

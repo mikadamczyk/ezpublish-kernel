@@ -10,6 +10,7 @@ namespace eZ\Publish\Core\FieldType\ImageAsset;
 
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use eZ\Publish\Core\FieldType\FieldType;
 use eZ\Publish\API\Repository\Values\Content\ContentInfo;
@@ -17,7 +18,9 @@ use eZ\Publish\Core\Base\Exceptions\InvalidArgumentType;
 use eZ\Publish\API\Repository\Values\Content\Relation;
 use eZ\Publish\Core\FieldType\ValidationError;
 use eZ\Publish\SPI\FieldType\Value as SPIValue;
+use eZ\Publish\SPI\Persistence\Content\Handler as SPIContentHandler;
 use eZ\Publish\Core\FieldType\Value as BaseValue;
+
 
 class Type extends FieldType
 {
@@ -39,18 +42,26 @@ class Type extends FieldType
     private $assetMapper;
 
     /**
+     * @var \eZ\Publish\SPI\Persistence\Content\Handler
+     */
+    private $handler;
+
+    /**
      * @param \eZ\Publish\API\Repository\ContentService $contentService
      * @param \eZ\Publish\API\Repository\ContentTypeService $contentTypeService
      * @param \eZ\Publish\Core\FieldType\ImageAsset\AssetMapper $mapper
+     * @param \eZ\Publish\SPI\Persistence\Content\Handler $handler
      */
     public function __construct(
         ContentService $contentService,
         ContentTypeService $contentTypeService,
-        AssetMapper $mapper
+        AssetMapper $mapper,
+        SPIContentHandler $handler
     ) {
         $this->contentService = $contentService;
         $this->contentTypeService = $contentTypeService;
         $this->assetMapper = $mapper;
+        $this->handler = $handler;
     }
 
     /**
@@ -95,6 +106,29 @@ class Type extends FieldType
     public function getFieldTypeIdentifier(): string
     {
         return self::FIELD_TYPE_IDENTIFIER;
+    }
+
+    /**
+     * @param \eZ\Publish\Core\FieldType\ImageAsset\Value|\eZ\Publish\SPI\FieldType\Value $value $value
+     */
+    public function getName(SPIValue $value, FieldDefinition $fieldDefinition, string $languageCode): string
+    {
+        if (empty($value->destinationContentId)) {
+            return '';
+        }
+
+        try {
+            $contentInfo = $this->handler->loadContentInfo($value->destinationContentId);
+            $versionInfo = $this->handler->loadVersionInfo($value->destinationContentId, $contentInfo->currentVersionNo);
+        } catch (NotFoundException $e) {
+            return '';
+        }
+
+        if (isset($versionInfo->names[$languageCode])) {
+            return $versionInfo->names[$languageCode];
+        }
+
+        return $versionInfo->names[$contentInfo->mainLanguageCode];
     }
 
     /**
