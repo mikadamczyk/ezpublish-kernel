@@ -78,8 +78,8 @@ class FieldTypeParameterProviderRegistryPassTest extends AbstractCompilerPassTes
     public function tagsProvider(): array
     {
         return [
-            ['ezpublish.fieldType.parameterProvider'],
-            ['ezplatform.field_type.parameter_provider'],
+            [FieldTypeParameterProviderRegistryPass::EZPUBLISH_FIELD_TYPE_PARAMETER_PROVIDER],
+            [FieldTypeParameterProviderRegistryPass::EZPLATFORM_FIELD_TYPE_PARAMETER_PROVIDER],
         ];
     }
 }
