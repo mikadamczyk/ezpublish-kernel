@@ -21,13 +21,9 @@ class Converter implements ConverterInterface
     /** @var \Symfony\Component\Serializer\Serializer */
     private $serializer;
 
-    /** @var string|null */
-    private $settingsClass;
-
-    public function __construct(Serializer $serializer, ?string $settingsClass = null)
+    public function __construct(Serializer $serializer)
     {
         $this->serializer = $serializer;
-        $this->settingsClass = $settingsClass;
     }
 
     public function toStorageValue(FieldValue $value, StorageFieldValue $storageFieldValue): void
@@ -52,13 +48,9 @@ class Converter implements ConverterInterface
 
     public function toStorageFieldDefinition(FieldDefinition $fieldDefinition, StorageFieldDefinition $storageDefinition): void
     {
-        if ($this->settingsClass === null) {
-            return;
-        }
-
         $settings = $fieldDefinition->fieldTypeConstraints->fieldSettings;
         if ($settings !== null) {
-            $settings = $this->serializer->serialize($settings['settings'], 'json');
+            $settings = $this->serializer->encode($settings, 'json');
         }
 
         $storageDefinition->dataText5 = $settings;
@@ -66,15 +58,9 @@ class Converter implements ConverterInterface
 
     public function toFieldDefinition(StorageFieldDefinition $storageDefinition, FieldDefinition $fieldDefinition): void
     {
-        if ($this->settingsClass === null) {
-            return;
-        }
-
         $settings = $storageDefinition->dataText5;
         if ($settings !== null) {
-            $settings = new FieldSettings([
-                'settings' => $this->serializer->deserialize($settings, $this->settingsClass, 'json'),
-            ]);
+            $settings = new FieldSettings($this->serializer->decode($settings, 'json'));
         }
 
         $fieldDefinition->fieldTypeConstraints->fieldSettings = $settings;

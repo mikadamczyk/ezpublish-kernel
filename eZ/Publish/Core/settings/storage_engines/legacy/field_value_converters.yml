@@ -26,7 +26,6 @@ parameters:
     ezpublish.fieldType.ezuser.converter.class: eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\UserConverter
     ezpublish.fieldType.eznull.converter.class: eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter\NullConverter
     ezpublish.fieldType.generic.converter.class: eZ\Publish\Core\FieldType\Generic\Converter
-    ezpublish.fieldType.generic.converter.provider.class: eZ\Publish\Core\FieldType\Generic\ConverterProvider
 
 services:
     # Note: converter services tagged with 'ezpublish.storageEngine.legacy.converter' or
@@ -49,21 +48,10 @@ services:
             - [ '@ezpublish.fieldType.generic.serializer.normalizer' ]
             - [ '@ezpublish.fieldType.generic.serializer.encoder' ]
 
-    ezpublish.fieldType.generic.converter.factory:
-        class: eZ\Publish\Core\FieldType\Generic\ConverterFactory
+    ezpublish.fieldType.generic.converter:
+        class: eZ\Publish\Core\FieldType\Generic\Converter
         arguments:
             - '@ezpublish.fieldType.generic.serializer'
-
-    ezpublish.fieldType.generic.converter.provider:
-        class: '%ezpublish.fieldType.generic.converter.provider.class%'
-        arguments:
-            - '@ezpublish.persistence.legacy.field_value_converter.registry.inner'
-            - '@ezpublish.persistence.field_type_registry'
-            - '@ezpublish.fieldType.generic.converter.factory'
-        lazy: true
-
-    ezpublish.persistence.legacy.field_value_converter.registry:
-        alias: ezpublish.fieldType.generic.converter.provider
 
     ezpublish.fieldType.ezauthor.converter:
         class: "%ezpublish.fieldType.ezauthor.converter.class%"

@@ -63,32 +63,6 @@ class FieldValueConverterRegistryTest extends TestCase
     }
 
     /**
-     * @covers \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\ConverterRegistry::hasConverter
-     */
-    public function testHasStorage(): void
-    {
-        $converter = $this->getFieldValueConverterMock();
-        $registry = new Registry(array('some-type' => $converter));
-
-        $this->assertTrue(
-            $registry->hasConverter('some-type')
-        );
-    }
-
-    /**
-     * @covers \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\ConverterRegistry::hasConverter
-     */
-    public function testHasNoStorage(): void
-    {
-        $converter = $this->getFieldValueConverterMock();
-        $registry = new Registry(array('some-type' => $converter));
-
-        $this->assertFalse(
-            $registry->hasConverter('some-other-type')
-        );
-    }
-
-    /**
      * @return \eZ\Publish\Core\Persistence\Legacy\Content\FieldValue\Converter|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function getFieldValueConverterMock()
