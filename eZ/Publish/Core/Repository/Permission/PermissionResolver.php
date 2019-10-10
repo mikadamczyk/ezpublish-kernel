@@ -290,6 +290,8 @@ class PermissionResolver implements PermissionResolverInterface
                 $possibleLimitations = [];
                 $possibleRoleLimitation = $permissionSet['limitation'];
                 foreach ($policyLimitations as $limitation) {
+                    $type = $this->limitationService->getLimitationType($limitation->getIdentifier());
+                    $targets = $this->prepareTargetsForType($targets, $type);
                     $limitationsPass = $this->isGrantedByLimitation($limitation, $currentUserReference, $object, $targets);
                     if (!$limitationsPass) {
                         break;

@@ -14,6 +14,7 @@ use eZ\Publish\API\Repository\Values\User\LookupLimitationResult;
 use eZ\Publish\API\Repository\Values\User\LookupPolicyLimitations;
 use eZ\Publish\API\Repository\Values\ValueObject;
 use eZ\Publish\Core\Repository\Values\User\UserReference;
+use eZ\Publish\SPI\Limitation\Target\Version;
 
 /**
  *  Test case for operations in the PermissionResolver.
@@ -1234,6 +1235,64 @@ class PermissionResolverTest extends BaseTest
         self::assertEquals(
             $expected,
             $permissionResolver->lookupLimitations($module, $function, $this->getContentCreateStruct($repository), [])
+        );
+    }
+
+    /**
+     * When {@see \eZ\Publish\SPI\Limitation\Target\Version} is passed as one of the $targets
+     * then proper LookupLimitationResult should be returned.
+     *
+     * @see https://jira.ez.no/browse/EZP-30978
+     */
+    public function testLookupLimitationsWithVersionInTargets(): void
+    {
+        $repository = $this->getRepository();
+        $userService = $repository->getUserService();
+        $permissionResolver = $repository->getPermissionResolver();
+        $roleService = $repository->getRoleService();
+        $content = $this->createFolder(['eng-GB' => 'Foo'], 2);
+        $module = 'content';
+        $function = 'edit';
+        $expectedLimitation = new Limitation\LocationLimitation(
+            ['limitationValues' => [$content->contentInfo->mainLocationId]]
+        );
+
+        $role = $this->createRoleWithPolicies(
+            'role_' . __FUNCTION__,
+            [
+                ['module' => $module, 'function' => $function, 'limitations' => [
+                    $expectedLimitation,
+                ]],
+            ]
+        );
+        // create user in root user group to avoid overlapping of existing policies and limitations
+        $user = $this->createUser('user', 'John', 'Doe', $userService->loadUserGroup(4));
+        $roleService->assignRoleToUser($role, $user);
+        $permissionResolver->setCurrentUserReference($user);
+        $expectedPolicy = current(array_filter($role->getPolicies(), function ($policy) use ($module, $function) {
+            return $policy->module === $module && $policy->function === $function;
+        }));
+        $expected = new LookupLimitationResult(
+            true,
+            [],
+            [
+                new LookupPolicyLimitations(
+                    $expectedPolicy,
+                    [$expectedLimitation]
+                ),
+            ]
+        );
+        $lookupLimitationResult = $permissionResolver->lookupLimitations(
+            $module,
+            $function,
+            $content->contentInfo,
+            [new Version()]
+        );
+
+        self::assertEquals(
+            $expected,
+            $lookupLimitationResult,
+            'When Version is passed as one of the `$targets` then proper LookupLimitationResult should be returned'
         );
     }
 
