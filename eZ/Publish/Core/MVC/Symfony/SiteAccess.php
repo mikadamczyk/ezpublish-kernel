@@ -1,8 +1,6 @@
 <?php
 
 /**
- * File containing the SiteAccess class.
- *
  * @copyright Copyright (C) eZ Systems AS. All rights reserved.
  * @license For full copyright and license information view LICENSE file distributed with this source code.
  */
@@ -37,11 +35,23 @@ class SiteAccess extends ValueObject
      */
     public $matcher;
 
-    public function __construct($name = null, $matchingType = null, $matcher = null)
+    /**
+     * The name of the provider from which Site Access comes.
+     *
+     * @var string
+     */
+    public $provider;
+
+    public function __construct(
+        string $name = null,
+        string $matchingType = null,
+        $matcher = null,
+        ?string $provider = null)
     {
         $this->name = $name;
         $this->matchingType = $matchingType;
         $this->matcher = $matcher;
+        $this->provider = $provider;
     }
 
     public function __toString()

@@ -23,8 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConsoleCommandListenerTest extends TestCase
 {
-    /** @var array */
-    private $siteAccessList = ['default', 'site1'];
+    const INVALID_SA_NAME = 'foo';
 
     /** @var SiteAccess */
     private $siteAccess;
@@ -46,7 +45,7 @@ class ConsoleCommandListenerTest extends TestCase
         parent::setUp();
         $this->siteAccess = new SiteAccess();
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->listener = new ConsoleCommandListener('default', $this->siteAccessList, $this->dispatcher);
+        $this->listener = new ConsoleCommandListener('default', $this->getSiteAccessProviderMock(), $this->dispatcher);
         $this->listener->setSiteAccess($this->siteAccess);
         $this->dispatcher->addSubscriber($this->listener);
         $this->inputDefinition = new InputDefinition([new InputOption('siteaccess', null, InputOption::VALUE_OPTIONAL)]);
@@ -66,7 +65,7 @@ class ConsoleCommandListenerTest extends TestCase
     public function testInvalidSiteAccessDev()
     {
         $this->expectException(\eZ\Publish\Core\MVC\Exception\InvalidSiteAccessException::class);
-        $this->expectExceptionMessageRegExp('/^Invalid siteaccess \'foo\', matched by .+\\. Valid siteaccesses are/');
+        $this->expectExceptionMessageRegExp('/^Invalid SiteAccess \'foo\', matched by .+\\. Valid SiteAccesses are/');
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
@@ -79,7 +78,7 @@ class ConsoleCommandListenerTest extends TestCase
     public function testInvalidSiteAccessProd()
     {
         $this->expectException(\eZ\Publish\Core\MVC\Exception\InvalidSiteAccessException::class);
-        $this->expectExceptionMessageRegExp('/^Invalid siteaccess \'foo\', matched by .+\\.$/');
+        $this->expectExceptionMessageRegExp('/^Invalid SiteAccess \'foo\', matched by .+\\.$/');
 
         $this->dispatcher->expects($this->never())
             ->method('dispatch');
@@ -107,5 +106,19 @@ class ConsoleCommandListenerTest extends TestCase
         $event = new ConsoleInitEvent($input, $this->testOutput);
         $this->listener->onConsoleCommand($event);
         $this->assertEquals(new SiteAccess('default', 'cli'), $this->siteAccess);
+    }
+
+    private function getSiteAccessProviderMock(): SiteAccess\SiteAccessProviderInterface
+    {
+        $siteAccessProviderMock = $this->createMock(SiteAccess\SiteAccessProviderInterface::class);
+        $siteAccessProviderMock
+            ->method('isDefined')
+            ->willReturnMap([
+                ['default', true],
+                ['site1', true],
+                [self::INVALID_SA_NAME, false],
+            ]);
+
+        return $siteAccessProviderMock;
     }
 }
