@@ -38,7 +38,7 @@ class ConsoleCommandListener implements EventSubscriberInterface, SiteAccessAwar
         string $defaultSiteAccessName,
         SiteAccess\SiteAccessProviderInterface $siteAccessProvider,
         EventDispatcherInterface $eventDispatcher,
-        $debug = false
+        bool $debug = false
     ) {
         $this->defaultSiteAccessName = $defaultSiteAccessName;
         $this->siteAccessProvider = $siteAccessProvider;

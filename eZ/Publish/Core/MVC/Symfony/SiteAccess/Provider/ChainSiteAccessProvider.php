@@ -21,7 +21,7 @@ final class ChainSiteAccessProvider implements SiteAccessProviderInterface
     /**
      * @param \eZ\Publish\Core\MVC\Symfony\SiteAccess\SiteAccessProviderInterface[] $providers
      */
-    public function __construct(iterable $providers)
+    public function __construct(iterable $providers = [])
     {
         $this->providers = $providers;
     }

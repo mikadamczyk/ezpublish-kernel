@@ -46,8 +46,8 @@ class SiteAccess extends ValueObject
         string $name = null,
         string $matchingType = null,
         $matcher = null,
-        ?string $provider = null)
-    {
+        ?string $provider = null
+    ) {
         $this->name = $name;
         $this->matchingType = $matchingType;
         $this->matcher = $matcher;

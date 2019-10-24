@@ -22,8 +22,12 @@ class InvalidSiteAccessException extends RuntimeException
      * @param string $matchType How $siteAccess was matched
      * @param bool $debug If true, Symfony environment is a debug one (like 'dev')
      */
-    public function __construct($siteAccess, SiteAccessProviderInterface $siteAccessProvider, $matchType, $debug = false)
-    {
+    public function __construct(
+        string $siteAccess,
+        SiteAccessProviderInterface $siteAccessProvider,
+        string $matchType,
+        bool $debug = false
+    ) {
         $message = "Invalid SiteAccess '$siteAccess', matched by $matchType.";
         if ($debug) {
             $siteAccessList = array_column(iterator_to_array($siteAccessProvider->getSiteAccesses()), 'name');
