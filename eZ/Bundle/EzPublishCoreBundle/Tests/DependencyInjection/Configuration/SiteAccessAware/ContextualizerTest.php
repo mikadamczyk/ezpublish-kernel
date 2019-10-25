@@ -39,7 +39,14 @@ class ContextualizerTest extends TestCase
     {
         parent::setUp();
         $this->container = $this->createMock(ContainerInterface::class);
-        $this->contextualizer = new Contextualizer($this->container, $this->namespace, $this->saNodeName, $this->availableSAs, $this->groupsBySA);
+        $this->contextualizer = new Contextualizer(
+            $this->container,
+            $this->namespace,
+            $this->saNodeName,
+            $this->availableSAs,
+            ['sa_group1', 'sa_group2'],
+            $this->groupsBySA)
+        ;
     }
 
     /**

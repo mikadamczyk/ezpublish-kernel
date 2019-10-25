@@ -106,21 +106,21 @@ class EzPublishCoreExtensionTest extends AbstractExtensionTestCase
         }
         $this->assertContainerBuilderHasParameter('ezpublish.siteaccess.groups_by_siteaccess', $groupsBySiteaccess);
 
-        $relatedSiteAccesses = ['ezdemo_site', 'eng', 'fre', 'ezdemo_site_admin'];
-        $this->assertContainerBuilderHasParameter(
-            'ezpublish.siteaccess.relation_map',
-            [
-                // Empty string is the default repository name
-                '' => [
-                    // 2 is the default rootLocationId
-                    2 => $relatedSiteAccesses,
-                ],
-            ]
-        );
-
-        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site.related_siteaccesses', $relatedSiteAccesses);
-        $this->assertContainerBuilderHasParameter('ezsettings.eng.related_siteaccesses', $relatedSiteAccesses);
-        $this->assertContainerBuilderHasParameter('ezsettings.fre.related_siteaccesses', $relatedSiteAccesses);
+//        $relatedSiteAccesses = ['ezdemo_site', 'eng', 'fre', 'ezdemo_site_admin'];
+//        $this->assertContainerBuilderHasParameter(
+//            'ezpublish.siteaccess.relation_map',
+//            [
+//                // Empty string is the default repository name
+//                '' => [
+//                    // 2 is the default rootLocationId
+//                    2 => $relatedSiteAccesses,
+//                ],
+//            ]
+//        );
+//
+//        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site.related_siteaccesses', $relatedSiteAccesses);
+//        $this->assertContainerBuilderHasParameter('ezsettings.eng.related_siteaccesses', $relatedSiteAccesses);
+//        $this->assertContainerBuilderHasParameter('ezsettings.fre.related_siteaccesses', $relatedSiteAccesses);
     }
 
     public function testSiteAccessNoConfiguration()
@@ -698,6 +698,7 @@ class EzPublishCoreExtensionTest extends AbstractExtensionTestCase
 
     public function testRelatedSiteAccesses()
     {
+        $this->markTestSkipped('RelatedSiteAccesses parameter is dropped.');
         $mainRepo = 'main';
         $fooRepo = 'foo';
         $rootLocationId1 = 123;
@@ -750,29 +751,29 @@ class EzPublishCoreExtensionTest extends AbstractExtensionTestCase
 
         $this->load($config);
 
-        $relatedSiteAccesses1 = ['ezdemo_site', 'eng', 'fre'];
-        $relatedSiteAccesses2 = ['ezdemo_site2', 'eng2'];
-        $relatedSiteAccesses3 = ['ezdemo_site3', 'fre3'];
-        $expectedRelationMap = [
-            $mainRepo => [
-                $rootLocationId1 => $relatedSiteAccesses1,
-                $rootLocationId2 => $relatedSiteAccesses2,
-            ],
-            $fooRepo => [
-                $rootLocationId3 => $relatedSiteAccesses3,
-            ],
-        ];
-        $this->assertContainerBuilderHasParameter('ezpublish.siteaccess.relation_map', $expectedRelationMap);
+//        $relatedSiteAccesses1 = ['ezdemo_site', 'eng', 'fre'];
+//        $relatedSiteAccesses2 = ['ezdemo_site2', 'eng2'];
+//        $relatedSiteAccesses3 = ['ezdemo_site3', 'fre3'];
+//        $expectedRelationMap = [
+//            $mainRepo => [
+//                $rootLocationId1 => $relatedSiteAccesses1,
+//                $rootLocationId2 => $relatedSiteAccesses2,
+//            ],
+//            $fooRepo => [
+//                $rootLocationId3 => $relatedSiteAccesses3,
+//            ],
+//        ];
+//        $this->assertContainerBuilderHasParameter('ezpublish.siteaccess.relation_map', $expectedRelationMap);
 
-        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site.related_siteaccesses', $relatedSiteAccesses1);
-        $this->assertContainerBuilderHasParameter('ezsettings.eng.related_siteaccesses', $relatedSiteAccesses1);
-        $this->assertContainerBuilderHasParameter('ezsettings.fre.related_siteaccesses', $relatedSiteAccesses1);
-
-        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site2.related_siteaccesses', $relatedSiteAccesses2);
-        $this->assertContainerBuilderHasParameter('ezsettings.eng2.related_siteaccesses', $relatedSiteAccesses2);
-
-        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site3.related_siteaccesses', $relatedSiteAccesses3);
-        $this->assertContainerBuilderHasParameter('ezsettings.fre3.related_siteaccesses', $relatedSiteAccesses3);
+//        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site.related_siteaccesses', $relatedSiteAccesses1);
+//        $this->assertContainerBuilderHasParameter('ezsettings.eng.related_siteaccesses', $relatedSiteAccesses1);
+//        $this->assertContainerBuilderHasParameter('ezsettings.fre.related_siteaccesses', $relatedSiteAccesses1);
+//
+//        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site2.related_siteaccesses', $relatedSiteAccesses2);
+//        $this->assertContainerBuilderHasParameter('ezsettings.eng2.related_siteaccesses', $relatedSiteAccesses2);
+//
+//        $this->assertContainerBuilderHasParameter('ezsettings.ezdemo_site3.related_siteaccesses', $relatedSiteAccesses3);
+//        $this->assertContainerBuilderHasParameter('ezsettings.fre3.related_siteaccesses', $relatedSiteAccesses3);
     }
 
     public function testRegisteredPolicies()

@@ -10,6 +10,7 @@ namespace eZ\Publish\Core\MVC\Symfony\SiteAccess\Provider;
 
 use eZ\Publish\Core\MVC\Symfony\SiteAccess;
 use eZ\Publish\Core\MVC\Symfony\SiteAccess\SiteAccessProviderInterface;
+use eZ\Publish\Core\MVC\Symfony\SiteAccessGroup;
 use Traversable;
 
 final class StaticSiteAccessProvider implements SiteAccessProviderInterface
@@ -17,13 +18,19 @@ final class StaticSiteAccessProvider implements SiteAccessProviderInterface
     /** @var string[] */
     private $siteAccessList;
 
+    /** @var string[] */
+    private $groupsBySiteAccess;
+
     /**
      * @param string[] $siteAccessList
+     * @param array $groupsBySiteAccess
      */
     public function __construct(
-        array $siteAccessList
+        array $siteAccessList,
+        array $groupsBySiteAccess
     ) {
         $this->siteAccessList = $siteAccessList;
+        $this->groupsBySiteAccess = $groupsBySiteAccess;
     }
 
     public function getSiteAccesses(): Traversable
@@ -42,6 +49,13 @@ final class StaticSiteAccessProvider implements SiteAccessProviderInterface
 
     public function getSiteAccess(string $name): SiteAccess
     {
-        return new SiteAccess($name, null, null, self::class);
+        $siteAccess = new SiteAccess($name, null, null, self::class);
+        if (isset($this->groupsBySiteAccess[$name])) {
+            $siteAccess->groups = array_map(function($group) {
+                return new SiteAccessGroup($group);
+            }, $this->groupsBySiteAccess[$name]);
+        }
+
+        return $siteAccess;
     }
 }

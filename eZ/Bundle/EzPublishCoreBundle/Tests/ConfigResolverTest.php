@@ -8,8 +8,13 @@
  */
 namespace eZ\Bundle\EzPublishCoreBundle\Tests;
 
+use eZ\Publish\Core\MVC\Exception\ParameterNotFoundException;
 use eZ\Publish\Core\MVC\Symfony\SiteAccess;
 use eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ConfigResolver;
+use eZ\Publish\Core\MVC\Symfony\SiteAccess\Provider\StaticSiteAccessProvider;
+use eZ\Publish\Core\MVC\Symfony\SiteAccess\SiteAccessProviderInterface;
+use eZ\Publish\Core\MVC\Symfony\SiteAccess\Tests\SiteAccessSetting;
+use eZ\Publish\Core\MVC\Symfony\SiteAccessGroup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -32,21 +37,74 @@ class ConfigResolverTest extends TestCase
      * @param string $defaultNS
      * @param int $undefinedStrategy
      * @param array $groupsBySiteAccess
+     * @param \eZ\Publish\Core\MVC\Symfony\SiteAccess\Tests\SiteAccessSetting[] $siteAccessProviderSettings
      *
      * @return \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\ConfigResolver
      */
-    private function getResolver($defaultNS = 'ezsettings', $undefinedStrategy = ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION, array $groupsBySiteAccess = [])
-    {
+    private function getResolver(
+        $defaultNS = 'ezsettings',
+        $undefinedStrategy = ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION,
+        array $groupsBySiteAccess = [],
+        array $siteAccessProviderSettings = []
+    ) {
+        $siteAccessProvider = $this->getSiteAccessProviderMock($siteAccessProviderSettings);
         $configResolver = new ConfigResolver(
             null,
             $groupsBySiteAccess,
             $defaultNS,
-            $undefinedStrategy
+            $undefinedStrategy,
+            $siteAccessProvider
         );
         $configResolver->setSiteAccess($this->siteAccess);
         $configResolver->setContainer($this->containerMock);
 
         return $configResolver;
+    }
+
+    /**
+     * @param \eZ\Publish\Core\MVC\Symfony\SiteAccess\Tests\SiteAccessSetting[] $settings
+     *
+     * @return \eZ\Publish\Core\MVC\Symfony\SiteAccess\SiteAccessProviderInterface
+     */
+    private function getSiteAccessProviderMock(array $settings = []): SiteAccessProviderInterface
+    {
+        $isDefinedMap = [];
+        $getSiteAccessMap = [];
+        foreach ($settings as $sa) {
+            $isDefinedMap[] = [$sa->name, $sa->isDefined];
+            $getSiteAccessMap[] = [
+                $sa->name,
+                $this->getSiteAccess(
+                    $sa->name,
+                    StaticSiteAccessProvider::class,
+                    $sa->groups
+                )
+            ];
+        }
+        $siteAccessProviderMock = $this->createMock(SiteAccess\SiteAccessProviderInterface::class);
+        $siteAccessProviderMock
+            ->method('isDefined')
+            ->willReturnMap($isDefinedMap);
+        $siteAccessProviderMock
+            ->method('getSiteAccess')
+            ->willReturnMap($getSiteAccessMap);
+
+        return $siteAccessProviderMock;
+    }
+
+    /**
+     * @param string[] $groupNames
+     */
+    protected function getSiteAccess(string $name, string $provider, array $groupNames): SiteAccess
+    {
+        $siteAccess = new SiteAccess($name, null, null, $provider);
+        $siteAccessGroups = [];
+        foreach ($groupNames as $groupName) {
+            $siteAccessGroups[] = new SiteAccessGroup($groupName);
+        }
+        $siteAccess->groups = $siteAccessGroups;
+
+        return $siteAccess;
     }
 
     public function testGetSetUndefinedStrategy()
@@ -66,15 +124,25 @@ class ConfigResolverTest extends TestCase
 
     public function testGetParameterFailedWithException()
     {
-        $this->expectException(\eZ\Publish\Core\MVC\Exception\ParameterNotFoundException::class);
+        $this->expectException(ParameterNotFoundException::class);
 
-        $resolver = $this->getResolver('ezsettings', ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION);
+        $resolver = $this->getResolver(
+            'ezsettings',
+            ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION,
+            [],
+            [new SiteAccessSetting('test', true)]
+        );
         $resolver->getParameter('foo');
     }
 
     public function testGetParameterFailedNull()
     {
-        $resolver = $this->getResolver('ezsettings', ConfigResolver::UNDEFINED_STRATEGY_NULL);
+        $resolver = $this->getResolver(
+            'ezsettings',
+            ConfigResolver::UNDEFINED_STRATEGY_NULL,
+            [],
+            [new SiteAccessSetting('test', true, )]
+        );
         $this->assertNull($resolver->getParameter('foo'));
     }
 
@@ -206,7 +274,20 @@ class ConfigResolverTest extends TestCase
             ->with($defaultScopeParameter)
             ->will($this->returnValue($expectedValue));
 
-        $this->assertSame($expectedValue, $this->getResolver()->getParameter($paramName));
+        $resolver = $this->getResolver(
+            'ezsettings',
+            ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION,
+            [],
+            [
+                new SiteAccessSetting(
+                    'test',
+                    true,
+                    SiteAccess\Router::DEFAULT_SA_MATCHING_TYPE,
+                )
+            ]
+        );
+
+        $this->assertSame($expectedValue, $resolver->getParameter($paramName));
     }
 
     public function hasParameterProvider()
@@ -233,7 +314,23 @@ class ConfigResolverTest extends TestCase
         $configResolver = $this->getResolver(
             'ezsettings',
             ConfigResolver::UNDEFINED_STRATEGY_EXCEPTION,
-            [$this->siteAccess->name => [$groupName]]
+            [$this->siteAccess->name => [$groupName]],
+            [
+                new SiteAccessSetting(
+                    'test',
+                    true,
+                    SiteAccess\Router::DEFAULT_SA_MATCHING_TYPE,
+                    null,
+                    ['my_group']
+                ),
+                new SiteAccessSetting(
+                    'another_siteaccess',
+                    true,
+                    SiteAccess\Router::DEFAULT_SA_MATCHING_TYPE,
+                    null,
+                    ['my_group']
+                )
+            ]
         );
 
         $this->containerMock->expects($this->atLeastOnce())
@@ -267,6 +364,22 @@ class ConfigResolverTest extends TestCase
             [
                 $this->siteAccess->name => ['some_group'],
                 $scope => [$groupName],
+            ],
+            [
+                new SiteAccessSetting(
+                    'test',
+                    true,
+                    SiteAccess\Router::DEFAULT_SA_MATCHING_TYPE,
+                    null,
+                    ['my_group']
+                ),
+                new SiteAccessSetting(
+                    'another_siteaccess',
+                    true,
+                    SiteAccess\Router::DEFAULT_SA_MATCHING_TYPE,
+                    null,
+                    ['my_group']
+                )
             ]
         );
 

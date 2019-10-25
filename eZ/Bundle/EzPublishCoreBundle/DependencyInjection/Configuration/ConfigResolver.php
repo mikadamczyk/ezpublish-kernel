@@ -34,6 +34,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * 1. "global"
  * 2. SiteAccess name
  * 3. "default"
+ *
+ * @property-read \Symfony\Component\DependencyInjection\ContainerInterface $container
  */
 class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, ContainerAwareInterface
 {
@@ -66,6 +68,9 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
     /** @var array[] List of blame => [params] loaded while siteAccess->matchingType was 'uninitialized' */
     private $tooEarlyLoadedList = [];
 
+    /** @var SiteAccess\SiteAccessProviderInterface */
+    private $siteAccessProvider;
+
     /**
      * @param \Psr\Log\LoggerInterface|null $logger
      * @param array $groupsBySiteAccess SiteAccess groups, indexed by siteaccess.
@@ -79,12 +84,14 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
         ?LoggerInterface $logger,
         array $groupsBySiteAccess,
         $defaultNamespace,
-        $undefinedStrategy = self::UNDEFINED_STRATEGY_EXCEPTION
+        $undefinedStrategy = self::UNDEFINED_STRATEGY_EXCEPTION,
+        SiteAccess\SiteAccessProviderInterface $siteAccessProvider
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->groupsBySiteAccess = $groupsBySiteAccess;
         $this->defaultNamespace = $defaultNamespace;
         $this->undefinedStrategy = $undefinedStrategy;
+        $this->siteAccessProvider = $siteAccessProvider;
     }
 
     public function setSiteAccess(SiteAccess $siteAccess = null)
@@ -126,9 +133,10 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
 
         // Relative scope, siteaccess group wise
         $groupScopeHasParam = false;
-        if (isset($this->groupsBySiteAccess[$scope])) {
-            foreach ($this->groupsBySiteAccess[$scope] as $groupName) {
-                $groupScopeParamName = "$namespace.$groupName.$paramName";
+        if ($this->siteAccessProvider->isDefined($scope)) {
+            $groups = $this->siteAccessProvider->getSiteAccess($scope)->groups;
+            foreach ($groups as $group) {
+                $groupScopeParamName = "$namespace.{$group->getName()}.$paramName";
                 if ($this->container->hasParameter($groupScopeParamName)) {
                     $groupScopeHasParam = true;
                     break;
@@ -173,9 +181,10 @@ class ConfigResolver implements VersatileScopeInterface, SiteAccessAware, Contai
         unset($relativeScopeParamName);
 
         // Relative scope, siteaccess group wise
-        if (isset($this->groupsBySiteAccess[$scope])) {
-            foreach ($this->groupsBySiteAccess[$scope] as $groupName) {
-                $relativeScopeParamName = "$namespace.$groupName.$paramName";
+        if ($this->siteAccessProvider->isDefined($scope)) {
+            $groups = $this->siteAccessProvider->getSiteAccess($scope)->groups;
+            foreach ($groups as $group) {
+                $relativeScopeParamName = "$namespace.{$group->getName()}.$paramName";
                 if ($this->container->hasParameter($relativeScopeParamName)) {
                     return $this->container->getParameter($relativeScopeParamName);
                 }
