@@ -198,6 +198,7 @@ class PcreCompiler
      */
     protected function getTransposeClosure($operator, $value)
     {
+        $value = str_replace('U+', '', $value);
         $value = hexdec($value) * ($operator === '-' ? -1 : 1);
         $converter = $this->converter;
 

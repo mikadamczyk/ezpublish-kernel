@@ -72,8 +72,8 @@ class TimeConverter implements Converter
      */
     public function toStorageFieldDefinition(FieldDefinition $fieldDef, StorageFieldDefinition $storageDef)
     {
-        $storageDef->dataInt1 = $fieldDef->fieldTypeConstraints->fieldSettings['defaultType'];
-        $storageDef->dataInt2 = $fieldDef->fieldTypeConstraints->fieldSettings['useSeconds'] ? 1 : 0;
+        $storageDef->dataInt1 = $fieldDef->fieldTypeConstraints->fieldSettings['defaultType'] ?? 0;
+        $storageDef->dataInt2 = (int)($fieldDef->fieldTypeConstraints->fieldSettings['useSeconds'] ?? false);
     }
 
     /**

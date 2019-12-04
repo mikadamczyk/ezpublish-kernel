@@ -227,7 +227,7 @@ class Handler implements BaseContentHandler
         }
 
         // Set always available name for the content
-        $metaDataUpdateStruct->name = $versionInfo->names[$versionInfo->contentInfo->mainLanguageCode];
+        $metaDataUpdateStruct->name = $versionInfo->names[$versionInfo->contentInfo->mainLanguageCode] ?? null;
 
         $this->contentGateway->updateContent($contentId, $metaDataUpdateStruct, $versionInfo);
         $this->locationGateway->createLocationsFromNodeAssignments(
