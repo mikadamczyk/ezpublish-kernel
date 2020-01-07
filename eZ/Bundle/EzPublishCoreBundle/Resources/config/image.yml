@@ -298,7 +298,7 @@ services:
         class: "%ezpublish.image_alias.variation_purger.legacy_storage_image_file.image_file_list.class%"
         arguments:
             - "@ezpublish.image_alias.variation_purger.legacy_storage_image_file.image_file_row_reader"
-            - $io.legacy_url_prefix$
+            - '@eZ\Publish\Core\IO\IOConfig'
             - $image.published_images_dir$
 
     ezpublish.image_alias.variation_purger.legacy_storage_image_file.image_file_row_reader:
