@@ -114,7 +114,7 @@ services:
         class: "%ezpublish.core.io.flysystem.default_adapter.class%"
         factory: ["@ezpublish.core.io.flysystem.local_adapter_factory", build]
         arguments:
-            - '@eZ\Publish\Core\IO\IOConfig'
+            - '@eZ\Publish\Core\IO\IOConfigProvider'
             - "$io.permissions.files$"
             - "$io.permissions.directories$"
 
@@ -124,7 +124,7 @@ services:
     ezpublish.core.io.prefix_url_decorator:
         class: "%ezpublish.core.io.url_decorator.absolute_prefix.class%"
         arguments:
-            - '@eZ\Publish\Core\IO\IOConfig'
+            - '@eZ\Publish\Core\IO\IOConfigProvider'
 
     # Base service for flysystem metadata handler
     ezpublish.core.io.metadata_handler.flysystem:
@@ -157,12 +157,12 @@ services:
     ezpublish.core.io.image_fieldtype.legacy_url_decorator:
         class: "%ezpublish.core.io.url_decorator.prefix.class%"
         arguments:
-            - '@eZ\Publish\Core\IO\IOConfig'
+            - '@eZ\Publish\Core\IO\IOConfigProvider'
 
     ezpublish.core.io.stream_file_listener:
         class: "%ezpublish.core.io.stream_file_listener.class%"
         arguments:
             - '@ezpublish.fieldType.ezimage.io_service'
-            - '@eZ\Publish\Core\IO\IOConfig'
+            - '@eZ\Publish\Core\IO\IOConfigProvider'
         tags:
             - { name: kernel.event_subscriber }
