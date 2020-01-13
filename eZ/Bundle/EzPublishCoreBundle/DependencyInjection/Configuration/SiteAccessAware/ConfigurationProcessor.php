@@ -1,8 +1,6 @@
 <?php
 
 /**
- * File containing the ScopeConfigurationProcessor class.
- *
  * @copyright Copyright (C) eZ Systems AS. All rights reserved.
  * @license For full copyright and license information view LICENSE file distributed with this source code.
  */
@@ -33,13 +31,18 @@ class ConfigurationProcessor
     protected static $groupsBySiteAccess = [];
 
     /**
+     * @var array
+     */
+    protected static $availableSiteAccessGroups = [];
+
+    /**
      * Name of the node under which scope based (semantic) configuration takes place.
      *
      * @var string
      */
     protected $scopeNodeName;
 
-    /** @var ContextualizerInterface */
+    /** @var \eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Configuration\SiteAccessAware\ContextualizerInterface */
     protected $contextualizer;
 
     public function __construct(ContainerInterface $containerBuilder, $namespace, $siteAcccessNodeName = 'system')
@@ -71,6 +74,11 @@ class ConfigurationProcessor
     public static function setGroupsBySiteAccess(array $groupsBySiteAccess)
     {
         static::$groupsBySiteAccess = $groupsBySiteAccess;
+    }
+
+    public static function setAvailableSiteAccessGroups(array $availableSiteAccessGroups)
+    {
+        static::$availableSiteAccessGroups = $availableSiteAccessGroups;
     }
 
     /**
@@ -153,7 +161,14 @@ class ConfigurationProcessor
      */
     protected function buildContextualizer(ContainerInterface $containerBuilder, $namespace, $siteAccessNodeName)
     {
-        return new Contextualizer($containerBuilder, $namespace, $siteAccessNodeName, static::$availableSiteAccesses, static::$groupsBySiteAccess);
+        return new Contextualizer(
+            $containerBuilder,
+            $namespace,
+            $siteAccessNodeName,
+            static::$availableSiteAccesses,
+            static::$availableSiteAccessGroups,
+            static::$groupsBySiteAccess
+        );
     }
 
     /**
