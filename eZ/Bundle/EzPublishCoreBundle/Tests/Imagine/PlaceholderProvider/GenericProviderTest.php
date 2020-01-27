@@ -9,6 +9,7 @@
 namespace eZ\Bundle\EzPublishCoreBundle\Tests\Imagine\PlaceholderProvider;
 
 use eZ\Bundle\EzPublishCoreBundle\Imagine\PlaceholderProvider\GenericProvider;
+use eZ\Bundle\EzPublishCoreBundle\Tests\Constraint\IsBoxSizeEqual;
 use eZ\Publish\Core\FieldType\Image\Value as ImageValue;
 use Imagine\Draw\DrawerInterface;
 use Imagine\Image\AbstractFont;
@@ -94,8 +95,7 @@ class GenericProviderTest extends TestCase
 
     private function assertSizeEquals(array $expected, BoxInterface $actual)
     {
-        $this->assertEquals($expected[0], $actual->getWidth());
-        $this->assertEquals($expected[1], $actual->getHeight());
+        $this->assertThat($actual, new IsBoxSizeEqual($expected));
     }
 
     private function assertColorEquals($expected, ColorInterface $actual)
