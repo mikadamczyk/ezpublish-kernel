@@ -8,7 +8,7 @@
  */
 namespace eZ\Publish\Core\FieldType\Tests;
 
-use eZ\Publish\Core\FieldType\EmailAddress\Value as EmailAddressValue;
+use eZ\Publish\Core\FieldType\Tests\Constraint\IsEmailAddress;
 use eZ\Publish\Core\FieldType\Validator\EmailAddressValidator;
 use eZ\Publish\Core\FieldType\Validator;
 use PHPUnit\Framework\TestCase;
@@ -88,8 +88,7 @@ class EmailAddressValidatorTest extends TestCase
         $validator->Extent = 'regex';
         $emailAddresses = ['john.doe@example.com', 'Info@eZ.No'];
         foreach ($emailAddresses as $value) {
-            $this->assertTrue($validator->validate(new EmailAddressValue($value)));
-            $this->assertSame([], $validator->getMessage());
+            $this->assertEmailAddress($validator, $value);
         }
     }
 
@@ -104,7 +103,12 @@ class EmailAddressValidatorTest extends TestCase
         $validator->Extent = 'regex';
         $emailAddresses = ['.john.doe@example.com', 'Info-at-eZ.No'];
         foreach ($emailAddresses as $value) {
-            $this->assertFalse($validator->validate(new EmailAddressValue($value)));
+            $this->assertThat($value, $this->logicalNot(new IsEmailAddress($validator)));
         }
+    }
+
+    public function assertEmailAddress(Validator $validator, string $email): void
+    {
+        $this->assertThat($email, new IsEmailAddress($validator));
     }
 }
